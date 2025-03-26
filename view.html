@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>View Tasks Only</title>
+  <script src="https://cdn.sheetjs.com/xlsx-0.19.3/package/dist/xlsx.full.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    body {
+      font-family: "Segoe UI", sans-serif;
+      background: linear-gradient(135deg, #e0f7fa, #e1f5fe);
+      padding: 20px;
+      min-height: 100vh;
+      transition: 0.3s ease;
+      color: #333;
+    }
+    h1 {
+      text-align: center;
+      color: #18188e;
+      margin-bottom: 5px;
+    }
+    p {
+      font-size: 16px;
+      margin-bottom: 5px;
+    }
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 20px;
+      background-color: white;
+      border-radius: 12px;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+    }
+    button {
+      padding: 8px 16px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 15px;
+      transition: 0.2s ease-in-out;
+      background-color: #18188e;
+      color: white;
+    }
+    button:hover {
+      opacity: 0.9;
+    }
+    button:active {
+      transform: scale(0.97);
+    }
+    #toggle-theme {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background-color: #444;
+    }
+    .task {
+      margin: 10px 0;
+      padding: 15px;
+      border-radius: 8px;
+      background-color: #f5f5f5;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      border-left: 5px solid #18188e;
+    }
+    .task h3 {
+      font-size: 20px;
+      margin-bottom: 5px;
+    }
+    .task p {
+      font-size: 15px;
+    }
+    .button-group {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 10px;
+      margin: 20px auto;
+    }
+
+    /* Dark Mode */
+    body.dark {
+      background: #121212;
+      color: #eee;
+    }
+    body.dark .container {
+      background-color: #1e1e1e;
+    }
+    body.dark .task {
+      background-color: #292929;
+      border-left-color: #4fc3f7;
+    }
+    body.dark h1 {
+      color: #4fc3f7;
+    }
+    body.dark p {
+      color: #ccc;
+    }
+    body.dark button {
+      background-color: #444;
+      color: white;
+    }
+    .main-container {
+      display: flex;
+      justify-content: space-between;
+      width: 100%;
+      max-width: 1200px;
+    }
+    .filters {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      margin-right: 20px;
+      background-color: #fff;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+      flex: 1;
+      max-width: 300px;
+    }
+    body.dark .filters {
+      background-color: #1e1e1e;
+    }
+    .filter-group {
+      margin-bottom: 20px;
+      text-align: left;
+      width: 100%;
+    }
+    .filter-group h4 {
+      margin-bottom: 10px;
+      color: #18188e;
+    }
+    body.dark .filter-group h4 {
+      color: #ccc;
+    }
+    .filter-group button {
+      width: 100%;
+      text-align: left;
+      padding: 10px;
+      margin-bottom: 5px;
+      border: none;
+      border-radius: 8px;
+      background-color: #f0f0f0;
+      color: #333;
+      cursor: pointer;
+      transition: background-color 0.3s, color 0.3s;
+    }
+    .filter-group button:hover {
+      background-color: #e0e0e0;
+    }
+    body.dark .filter-group button {
+      background-color: #333;
+      color: #eee;
+    }
+    body.dark .filter-group button:hover {
+      background-color: #444;
+    }
+    .content {
+      flex: 3;
+    }
+  </style>
+</head>
+<body>
+
+  <button onclick="window.location.href='index.html'" style="margin: 20px auto; display: block;">
+    🔙 Back to Home Page
+  </button>
+
+  <button id="toggle-theme">🌙 Toggle Dark Mode</button>
+
+  <div class="main-container">
+    <!-- Filter Buttons -->
+    <div class="filters">
+      <div class="filter-group">
+        <h4>Status</h4>
+        <button onclick="showAll()">📋 All Tasks</button>
+        <button onclick="showDone()">✅ Done</button>
+        <button onclick="showUndone()">🕑 Not Done</button>
+      </div>
+      <div class="filter-group">
+        <h4>Sort</h4>
+        <button onclick="sortByPriority()">🗂️ By Priority</button>
+        <button onclick="sortByDate()">📅 By Date</button>
+        <button onclick="sortByName()">🔤 By Name</button>
+      </div>
+      <div class="filter-group">
+        <h4>Export</h4>
+        <button onclick="downloadPDF()">📤 Download PDF</button>
+        <button onclick="window.print()">🖨️ Print</button>
+        <button onclick="exportToExcel()">📊 Export to Excel</button>
+        <button onclick="downloadCSV()">📄 Download CSV</button>
+      </div>
+    </div>
+
+    <!-- Content Section -->
+    <div class="content">
+      <div class="container">
+        <div class="header">
+          <h1>📋 Your Tasks</h1>
+          <p>View-only page</p>
+        </div>
+        <div id="task-view" class="tasks"></div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let tasks = JSON.parse(localStorage.getItem("dataTask")) || [];
+
+    function displayTasks(list) {
+      const container = document.getElementById("task-view");
+      container.innerHTML = "";
+      list.forEach(task => {
+        container.innerHTML += `
+          <div class="task">
+            <h3>${task.title}</h3>
+            <p>📅 ${task.date}</p>
+            <p>🔥 Priority: ${task.priority}</p>
+            <p>${task.isDone ? "✅ Done" : "❌ Not Done"}</p>
+            <p>🗓️ Deadline: ${task.deadline || "No deadline"}</p>
+          </div>
+        `;
+      });
+    }
+
+    function showAll() {
+      displayTasks(tasks);
+    }
+    function showDone() {
+      displayTasks(tasks.filter(t => t.isDone));
+    }
+    function showUndone() {
+      displayTasks(tasks.filter(t => !t.isDone));
+    }
+    function sortByPriority() {
+      const order = { high: 1, medium: 2, low: 3 };
+      displayTasks([...tasks].sort((a, b) => order[a.priority] - order[b.priority]));
+    }
+    function sortByDate() {
+      displayTasks([...tasks].sort((a, b) => new Date(a.date) - new Date(b.date)));
+    }
+    function sortByName() {
+      displayTasks([...tasks].sort((a, b) => a.title.localeCompare(b.title)));
+    }
+
+    function downloadPDF() {
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF();
+      let y = 10;
+      tasks.forEach(task => {
+        doc.text(`Title: ${task.title}`, 10, y); y += 7;
+        doc.text(`Date: ${task.date}`, 10, y); y += 7;
+        doc.text(`Priority: ${task.priority}`, 10, y); y += 7;
+        doc.text(`Status: ${task.isDone ? "Done" : "Not Done"}`, 10, y); y += 7;
+        doc.text(`Deadline: ${task.deadline || "None"}`, 10, y); y += 10;
+      });
+      doc.save("tasks.pdf");
+    }
+
+    function exportToExcel() {
+      if (!tasks.length) return alert("No tasks to export!");
+      const sheet = XLSX.utils.json_to_sheet(tasks);
+      const book = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(book, sheet, "Tasks");
+      XLSX.writeFile(book, "tasks.xlsx");
+    }
+
+    function downloadCSV() {
+      if (!tasks.length) return alert("No tasks to export!");
+      const csvContent = "data:text/csv;charset=utf-8,"
+        + tasks.map(task => `${task.title},${task.date},${task.priority},${task.isDone ? "Done" : "Not Done"},${task.deadline || "None"}`).join("\n");
+      const encodedUri = encodeURI(csvContent);
+      const link = document.createElement("a");
+      link.setAttribute("href", encodedUri);
+      link.setAttribute("download", "tasks.csv");
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
+
+    document.getElementById("toggle-theme").addEventListener("click", () => {
+      document.body.classList.toggle("dark");
+    });
+
+    displayTasks(tasks);
+  </script>
+</body>
+</html>

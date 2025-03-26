@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>To-Do List</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
+  <script src="https://cdn.sheetjs.com/xlsx-0.19.3/package/dist/xlsx.full.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+</head>
+<body>
+  <!-- Theme Toggle -->
+  <button id="theme-toggle">🌗 Toggle Theme</button>
+
+  <!-- Main Container -->
+  <div class="main-container">
+    <!-- Filter Buttons -->
+    <div class="filters">
+      <!-- Status Filters -->
+      <div class="filter-group">
+        <h4>Status</h4>
+        <button id="filter-done">✅ Work done</button>
+        <button id="filter-undone">🕑 Work is not done</button>
+        <button id="show-all">📋 All works</button>
+      </div>
+
+      <!-- Sorting Filters -->
+      <div class="filter-group">
+        <h4>Sort</h4>
+        <button id="sort-oldest">⏳ Sort by oldest</button>
+        <button id="sort-priority">🗂️ Sort by priority</button>
+        <button id="sort-date">📅 Sort by date</button>
+        <button id="sort-name">🔤 Sort A → Z</button>
+      </div>
+
+      <!-- Deadline Filters -->
+      <div class="filter-group">
+        <h4>Deadlines</h4>
+        <button id="filter-today">📅 Today's tasks</button>
+        <button id="filter-deadline-today">📌 Today's deadlines</button>
+        <button id="filter-deadline-passed">⏰ Passed deadlines</button>
+        <button id="filter-deadline-future">📅 Future deadlines</button>
+      </div>
+
+      <!-- Other -->
+      <div class="filter-group">
+        <h4>Actions</h4>
+        <button id="reset-filters">🔁 Reset filters</button>
+        <button id="clear-all">🗑️ Clear all</button>
+        <button onclick="window.location.href='view.html'">👁️ View only</button>
+      </div>
+      <div class="filter-group">
+        <h4>Export</h4>
+        <button onclick="exportToExcel()">📊 Export to Excel</button>
+        <button onclick="downloadPDF()">📤 Download PDF</button>
+        <button onclick="printTasks()">🖨️ Print</button>
+        <button onclick="downloadCSV()">📄 Download CSV</button>
+      </div>
+    </div>
+
+    <!-- Content Section -->
+    <div class="content">
+      <!-- Header Section -->
+      <div class="header">
+        <h1>Work To-Dos</h1>
+        <p>Get your daily tasks done with a to-do list</p>
+      </div>
+
+      <!-- Stats and Clock -->
+      <div id="stats">📊 Loading...</div>
+      <div id="clock">🕒 Loading time...</div>
+
+      <!-- Search -->
+      <div class="search">
+        <input id="search-input" type="text" placeholder="🔍 Search for work..." />
+      </div>
+
+      <!-- Tasks Section -->
+      <div class="tasks">
+        <!-- Add Task Button -->
+        <div class="add-task">
+          <button id="add-btn" class="circule">
+            <span class="material-symbols-outlined">add</span>
+          </button>
+          <h3>Task</h3>
+        </div>
+
+        <!-- Tasks List -->
+        <div id="task"></div>
+      </div>
+
+      <!-- Task Form Page -->
+      <div class="page text">
+        <div class="input">
+          <label>Enter task name</label>
+          <input id="input" type="text" placeholder="Task Name..." />
+
+          <label>Deadline</label>
+          <input id="deadline" type="date" />
+
+          <label>Priority</label>
+          <select id="priority">
+            <option value="low">🟢 Low</option>
+            <option value="medium">🟡 Medium</option>
+            <option value="high">🔴 High</option>
+          </select>
+        </div>
+        <div class="btn">
+          <button id="add">Add</button>
+          <button id="cancel">Cancel</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- Script -->
+  <script src="main.js"></script>
+
+</body>
+</html>
