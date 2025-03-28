@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>🎨 Draw & 3D Convert</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #f0f0f0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    canvas#drawCanvas {
+      border: 2px solid #333;
+      margin-top: 20px;
+      cursor: crosshair;
+    }
+
+    #controls {
+      margin: 20px;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 10px;
+    }
+
+    button, select, input[type=color], input[type=range] {
+      padding: 10px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      font-size: 14px;
+      cursor: pointer;
+    }
+
+    #three-container {
+      width: 100%;
+      height: 400px;
+    }
+  </style>
+</head>
+<body>
+  <h2>✏️ Draw on Canvas and Convert to 3D Cube</h2>
+  <canvas id="drawCanvas" width="400" height="400"></canvas>
+
+  <div id="controls">
+    <input type="color" id="colorPicker" value="#000000" />
+    <input type="range" id="brushSize" min="1" max="10" value="2" />
+    <button onclick="clearCanvas()">🧹 Clear</button>
+    <button onclick="convertTo3D()">🧊 Convert to 3D</button>
+    <button onclick="window.location.href='index.html'">🔙 Back</button>
+  </div>
+
+  <div id="three-container"></div>
+
+  <script>
+    const canvas = document.getElementById('drawCanvas');
+    const ctx = canvas.getContext('2d');
+    let isDrawing = false;
+
+    const colorPicker = document.getElementById('colorPicker');
+    const brushSize = document.getElementById('brushSize');
+
+    canvas.addEventListener('mousedown', () => isDrawing = true);
+    canvas.addEventListener('mouseup', () => isDrawing = false);
+    canvas.addEventListener('mouseout', () => isDrawing = false);
+    canvas.addEventListener('mousemove', draw);
+
+    function draw(e) {
+      if (!isDrawing) return;
+      const rect = canvas.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+
+      ctx.fillStyle = colorPicker.value;
+      ctx.beginPath();
+      ctx.arc(x, y, brushSize.value, 0, Math.PI * 2);
+      ctx.fill();
+    }
+
+    function clearCanvas() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      document.getElementById('three-container').innerHTML = '';
+    }
+  </script>
+
+  <script type="module">
+    import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.152.2/build/three.module.js';
+    window.THREE = THREE;
+
+    window.convertTo3D = function () {
+      const container = document.getElementById('three-container');
+      container.innerHTML = '';
+
+      const scene = new THREE.Scene();
+      const camera = new THREE.PerspectiveCamera(75, container.clientWidth / 400, 0.1, 1000);
+      const renderer = new THREE.WebGLRenderer();
+      renderer.setSize(container.clientWidth, 400);
+      container.appendChild(renderer.domElement);
+
+      const canvasTexture = new THREE.CanvasTexture(canvas);
+      const geometry = new THREE.BoxGeometry(2, 2, 2);
+      const material = new THREE.MeshStandardMaterial({ map: canvasTexture });
+      const cube = new THREE.Mesh(geometry, material);
+      scene.add(cube);
+
+      const light = new THREE.DirectionalLight(0xffffff, 1);
+      light.position.set(5, 5, 5);
+      scene.add(light);
+
+      camera.position.z = 5;
+
+      function animate() {
+        requestAnimationFrame(animate);
+        cube.rotation.x += 0.01;
+        cube.rotation.y += 0.01;
+        renderer.render(scene, camera);
+      }
+      animate();
+    }
+  </script>
+</body>
+</html>

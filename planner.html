@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>📅 Daily Planner</title>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <style>
+    body {
+      font-family: 'Roboto', sans-serif;
+      background: linear-gradient(135deg, #e0f7fa, #fffde7);
+      padding: 20px;
+      color: #333;
+      transition: background 0.3s, color 0.3s;
+    }
+    body.dark {
+      background: linear-gradient(135deg, #1e1e1e, #2b2b2b);
+      color: #eee;
+    }
+    body.dark input,
+    body.dark select {
+      background-color: #333;
+      color: #fff;
+      border-color: #555;
+    }
+    body.dark .slot input[type="text"]::placeholder {
+      color: #aaa;
+    }
+    h1 {
+      text-align: center;
+      color: #18188e;
+      margin-bottom: 20px;
+    }
+    .planner {
+      max-width: 800px;
+      margin: auto;
+    }
+    .slot {
+      display: flex;
+      align-items: center;
+      margin-bottom: 10px;
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      background-color: #f9f9f9;
+      transition: background-color 0.3s, box-shadow 0.3s;
+    }
+    .slot:hover {
+      background-color: #e0f7fa;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+    .slot label {
+      width: 100px;
+      display: flex;
+      align-items: center;
+    }
+    .slot label::before {
+      content: "\1F4C5";
+      margin-right: 6px;
+    }
+    .slot input[type="text"], .slot select {
+      flex: 1;
+      padding: 8px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+    }
+    .slot input[type="text"]:focus,
+    .slot select:focus {
+      border-color: #18188e;
+      box-shadow: 0 0 5px rgba(24, 24, 142, 0.5);
+      outline: none;
+    }
+    .slot input[type="checkbox"] {
+      margin-left: 10px;
+      transform: scale(1.2);
+    }
+    .controls {
+      text-align: center;
+      margin-top: 20px;
+      flex-wrap: wrap;
+    }
+    #taskStats {
+      text-align: center;
+      margin-top: 15px;
+      font-weight: bold;
+    }
+    button {
+      padding: 10px 20px;
+      margin: 5px;
+      border: none;
+      border-radius: 8px;
+      background: #18188e;
+      color: white;
+      cursor: pointer;
+      transition: background 0.3s, transform 0.2s;
+    }
+    button:hover {
+      background: #0e0e6b;
+      transform: scale(1.05);
+    }
+    .day-selector {
+    text-align: center;
+    margin-top: 30px;
+  }
+
+  .day-selector label {
+    font-weight: bold;
+    font-size: 16px;
+    margin-right: 10px;
+  }
+
+  .day-selector select {
+    padding: 10px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    font-size: 16px;
+    background-color: #f9f9f9;
+    transition: 0.3s;
+  }
+
+  body.dark .day-selector select {
+    background-color: #333;
+    color: #fff;
+    border-color: #555;
+  }
+  .file-upload {
+    text-align: center;
+    margin-top: 20px;
+  }
+
+  .file-upload input[type="file"] {
+    padding: 10px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    font-size: 15px;
+    background-color: #f0f0f0;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+
+  .file-upload input[type="file"]:hover {
+    background-color: #e0e0e0;
+  }
+
+  body.dark .file-upload input[type="file"] {
+    background-color: #2c2c2c;
+    color: #fff;
+    border-color: #444;
+  }
+  body.dark .file-upload input[type="file"]:hover {
+    background-color: #3a3a3a;
+  }
+  .file-upload input[type="file"]:focus {
+    border-color: #18188e;
+    box-shadow: 0 0 5px rgba(24, 24, 142, 0.5);
+    outline: none;
+  }
+    @media (max-width: 600px) {
+      .slot {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+      .slot label {
+        margin-bottom: 5px;
+      }
+    }
+    body.dark .slot {
+      background-color: #2c2c2c;
+      border-color: #444;
+    }
+    body.dark .slot:hover {
+      background-color: #333;
+      box-shadow: 0 2px 8px rgba(255, 255, 255, 0.1);
+    }
+  </style>
+</head>
+<body>
+  <h1>📅 Daily Planner</h1>
+  <div class="controls">
+    <button onclick="window.location.href='index.html'">🔙 Back to Home</button>
+  </div>
+  <div id="passwordSection">
+    <input type="password" id="password" placeholder="Enter password" style="padding: 8px; margin-bottom: 10px; width: 100%; border-radius: 8px; border: 1px solid #ccc;">
+    <div style="text-align: center; margin-bottom: 20px;">
+      <button onclick="checkPassword()">OK</button>
+      <button onclick="cancelPassword()">Cancel</button>
+    </div>
+  </div>
+  <div id="mainContent" style="display:none;">
+    <input type="text" id="search" placeholder="🔍 Search task..." oninput="searchTasks()" style="width:100%;padding:10px;margin-bottom:20px;border-radius:8px;border:1px solid #ccc;">
+
+    <div class="controls">
+      <button onclick="exportPDF()">📄 PDF</button>
+      <button onclick="exportTasks()">📁 Export</button>
+      <button onclick="toggleTheme()">🌗 Toggle Theme</button>
+      <button onclick="window.location.href='index.html'">🔙 Back to Home</button>
+      <button onclick="printPlanner()">🖨️ Print</button>
+    </div>
+    <div class="file-upload">
+      <label for="importFile">📥 Import Tasks:</label>
+      <input type="file" id="importFile" accept=".txt" style="display:none;" onchange="confirmImport()" />
+      <button onclick="document.getElementById('importFile').click()">📂 Choose File</button>
+    </div>
+    <div id="taskStats"></div>
+    <div class="day-selector">
+        <label for="daySelector">Choose Day:</label>
+        <select id="daySelector" onchange="loadSelectedDay()">
+          <option value="Monday">Monday</option>
+          <option value="Tuesday">Tuesday</option>
+          <option value="Wednesday">Wednesday</option>
+          <option value="Thursday">Thursday</option>
+          <option value="Friday">Friday</option>
+          <option value="Saturday">Saturday</option>
+          <option value="Sunday">Sunday</option>
+        </select>
+      </div>
+      <div class="planner" id="planner"></div>
+  </div>
+
+  <script>
+    const hours = Array.from({ length: 15 }, (_, i) => 7 + i);
+    const plannerDiv = document.getElementById("planner");
+    const remindedTasks = new Set();
+
+    function createPlanner() {
+      plannerDiv.innerHTML = "";
+      const day = document.getElementById("daySelector")?.value || "Monday";
+      const saved = JSON.parse(localStorage.getItem("dailyPlanner")) || {};
+      const dayData = saved[day] || {};
+
+      hours.forEach(hour => {
+        const label = `${hour}:00`;
+        const task = dayData[label]?.text || "";
+        const category = dayData[label]?.category || "General";
+        const done = dayData[label]?.done || false;
+        plannerDiv.innerHTML += `
+          <div class="slot">
+            <label>${label}</label>
+            <input type="text" id="hour-${hour}" value="${task}" placeholder="Add your task..." oninput="autoSave()" />
+            <select id="cat-${hour}" onchange="autoSave()">
+              <option value="General" ${category==="General"?'selected':''}>General</option>
+              <option value="Gym" ${category==="Gym"?'selected':''}>Gym</option>
+              <option value="Study" ${category==="Study"?'selected':''}>Study</option>
+              <option value="Meeting" ${category==="Meeting"?'selected':''}>Meeting</option>
+            </select>
+            <input type="checkbox" id="done-${hour}" ${done ? 'checked' : ''} onchange="autoSave()" />
+          </div>
+        `;
+      });
+      highlightTasks();
+      updateTaskStats();
+    }
+
+    function autoSave() {
+      const day = document.getElementById("daySelector")?.value || "Monday";
+      const fullData = JSON.parse(localStorage.getItem("dailyPlanner")) || {};
+      const data = {};
+
+      hours.forEach(hour => {
+        const input = document.getElementById(`hour-${hour}`);
+        const category = document.getElementById(`cat-${hour}`).value;
+        const done = document.getElementById(`done-${hour}`).checked;
+        data[`${hour}:00`] = { text: input.value, category, done };
+      });
+      fullData[day] = data;
+      localStorage.setItem("dailyPlanner", JSON.stringify(fullData));
+      highlightTasks();
+      updateTaskStats();
+    }
+
+    function highlightTasks() {
+      hours.forEach(hour => {
+        const input = document.getElementById(`hour-${hour}`);
+        const done = document.getElementById(`done-${hour}`).checked;
+        input.style.textDecoration = done ? "line-through" : "none";
+      });
+    }
+
+    function updateTaskStats() {
+      let done = 0;
+      let total = 0;
+      hours.forEach(hour => {
+        const input = document.getElementById(`hour-${hour}`);
+        if (input && input.value.trim() !== "") {
+          total++;
+          const isDone = document.getElementById(`done-${hour}`).checked;
+          if (isDone) done++;
+        }
+      });
+      document.getElementById("taskStats").innerText = `✅ Done: ${done} / ${total} tasks`;
+    }
+
+    function loadSelectedDay() {
+      createPlanner();
+    }
+
+    function exportTasks() {
+      let content = "Daily Planner\n\n";
+      const day = document.getElementById("daySelector")?.value || "Monday";
+      const saved = JSON.parse(localStorage.getItem("dailyPlanner")) || {};
+      const dayData = saved[day] || {};
+      hours.forEach(hour => {
+        const task = dayData[`${hour}:00`]?.text || "";
+        content += `${hour}:00 - ${task}\n`;
+      });
+      const blob = new Blob([content], { type: "text/plain" });
+      const link = document.createElement("a");
+      link.href = URL.createObjectURL(blob);
+      link.download = `${day}_Planner.txt`;
+      link.click();
+    }
+         function exportPDF() {
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF();
+      doc.setFontSize(14);
+      doc.text("Daily Planner", 20, 20);
+      let y = 30;
+      hours.forEach(hour => {
+        const input = document.getElementById(`hour-${hour}`);
+        doc.text(`${hour}:00 - ${input.value}`, 20, y);
+        y += 10;
+      });
+      doc.save("DailyPlanner.pdf");
+    }
+
+    function searchTasks() {
+      const query = document.getElementById("search").value.toLowerCase();
+      hours.forEach(hour => {
+        const input = document.getElementById(`hour-${hour}`);
+        const task = input.value.toLowerCase();
+        input.parentElement.style.display = task.includes(query) ? "flex" : "none";
+      });
+    }
+    function toggleTheme() {
+      document.body.classList.toggle("dark");
+      localStorage.setItem("plannerTheme", document.body.classList.contains("dark") ? "dark" : "light");
+    }
+    function importTasks() {
+  const file = document.getElementById("importFile").files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function (e) {
+    const lines = e.target.result.split("\n");
+    const data = {};
+    lines.forEach(line => {
+      const [time, task] = line.split(" - ");
+      if (time && task) {
+        data[time.trim()] = { text: task.trim(), category: "General", done: false };
+      }
+    });
+    const day = document.getElementById("daySelector")?.value || "Monday";
+    const allData = JSON.parse(localStorage.getItem("dailyPlanner")) || {};
+    allData[day] = data;
+    localStorage.setItem("dailyPlanner", JSON.stringify(allData));
+    alert("✅ Imported successfully!");
+    createPlanner();
+  };
+  reader.readAsText(file);
+}
+
+    function checkPassword() {
+      const pass = document.getElementById("password").value;
+      if (pass === "planner2024") {
+        document.getElementById("mainContent").style.display = "block";
+        document.getElementById("passwordSection").style.display = "none";
+        if (localStorage.getItem("plannerTheme") === "dark") {
+          document.body.classList.add("dark");
+        }
+        createPlanner();
+      } else {
+        alert("❌ Incorrect password!");
+      }
+    }
+
+    function cancelPassword() {
+      document.getElementById("password").value = "";
+    }
+
+    function confirmImport() {
+      const file = document.getElementById("importFile").files[0];
+      if (file && confirm("Are you sure you want to import tasks from this file?")) {
+        importTasks();
+      } else {
+        document.getElementById("importFile").value = ""; // Reset file input
+      }
+    }
+
+    function printPlanner() {
+      const printContent = document.getElementById("planner").innerHTML;
+      const originalContent = document.body.innerHTML;
+      document.body.innerHTML = `<div>${printContent}</div>`;
+      window.print();
+      document.body.innerHTML = originalContent;
+      location.reload(); // Reload to restore functionality
+    }
+
+    setInterval(() => {
+      const now = new Date();
+      const currentHour = now.getHours();
+      const day = document.getElementById("daySelector")?.value || "Monday";
+      hours.forEach(h => {
+        const input = document.getElementById(`hour-${h}`);
+        if (input && input.value) {
+          const label = `${h}:00`;
+          const taskTime = new Date();
+          taskTime.setHours(h, 0, 0, 0);
+          const diff = taskTime - now;
+          if (diff > 0 && diff < 10 * 60 * 1000 && !remindedTasks.has(label)) {
+            alert(`⏰ Reminder: ${input.value} at ${label}`);
+            remindedTasks.add(label);
+          }
+        }
+      });
+    }, 60000);
+  </script>
+</body>
+</html>
