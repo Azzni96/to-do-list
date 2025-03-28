@@ -173,50 +173,66 @@
       background-color: #333;
       box-shadow: 0 2px 8px rgba(255, 255, 255, 0.1);
     }
+    .container {
+      display: flex;
+      justify-content: space-between;
+    }
+    .left-panel {
+      flex: 1;
+      padding-right: 20px;
+    }
+    .right-panel {
+      flex: 2;
+     
+    }
   </style>
 </head>
 <body>
-  <div id="lock-screen" style="position:fixed; top:0; left:0; width:100%; height:100%; background:#121212cc; display:flex; align-items:center; justify-content:center; z-index:9999;">
-    <div style="background:white; padding:30px; border-radius:10px; text-align:center; max-width:300px; width:100%;">
-      <h3>🔒 Enter Password</h3>
-      <input type="password" id="unlock-password" placeholder="••••" style="padding:10px; width:100%; margin:15px 0; border-radius:8px;" />
-      <button onclick="checkPassword()" class="btn">🔓 Unlock</button>
-      <p id="error-msg" style="color:red; margin-top:10px;"></p>
-    </div>
-  </div>
-  <div id="mainContent" style="display:none;">
-    <h1>📅 Daily Planner</h1>
-    <div class="controls">
-      <button onclick="window.location.href='index.html'">🔙 Back to Home</button>
-    </div>
-    <input type="text" id="search" placeholder="🔍 Search task..." oninput="searchTasks()" style="width:100%;padding:10px;margin-bottom:20px;border-radius:8px;border:1px solid #ccc;">
+  <div id="mainContent">
+    <div class="container">
+        <div>
+            <button onclick="toggleTheme()">🌗 Toggle Theme</button>
+        </div>
+      <div class="left-panel">
 
-    <div class="controls">
-      <button onclick="exportPDF()">📄 PDF</button>
-      <button onclick="exportTasks()">📁 Export</button>
-      <button onclick="toggleTheme()">🌗 Toggle Theme</button>
-      <button onclick="window.location.href='index.html'">🔙 Back to Home</button>
-      <button onclick="printPlanner()">🖨️ Print</button>
-    </div>
-    <div class="file-upload">
-      <label for="importFile">📥 Import Tasks:</label>
-      <input type="file" id="importFile" accept=".txt" style="display:none;" onchange="confirmImport()" />
-      <button onclick="document.getElementById('importFile').click()">📂 Choose File</button>
-    </div>
-    <div id="taskStats"></div>
-    <div class="day-selector">
-        <label for="daySelector">Choose Day:</label>
-        <select id="daySelector" onchange="loadSelectedDay()">
-          <option value="Monday">Monday</option>
-          <option value="Tuesday">Tuesday</option>
-          <option value="Wednesday">Wednesday</option>
-          <option value="Thursday">Thursday</option>
-          <option value="Friday">Friday</option>
-          <option value="Saturday">Saturday</option>
-          <option value="Sunday">Sunday</option>
-        </select>
+        <input type="text" id="search" placeholder="🔍 Search task..." oninput="searchTasks()" style="width:100%;padding:10px;margin-bottom:20px;border-radius:8px;border:1px solid #ccc;">
+        <div class="day-selector">
+          <label for="daySelector">Choose Day:</label>
+          <select id="daySelector" onchange="showDayConfirmation()">
+            <option value="">Select a day</option>
+            <option value="Monday">Monday</option>
+            <option value="Tuesday">Tuesday</option>
+            <option value="Wednesday">Wednesday</option>
+            <option value="Thursday">Thursday</option>
+            <option value="Friday">Friday</option>
+            <option value="Saturday">Saturday</option>
+            <option value="Sunday">Sunday</option>
+          </select>
+          <div id="dayConfirmation" style="display:none; margin-top: 10px;">
+            <button onclick="confirmDaySelection()">OK</button>
+            <button onclick="cancelDaySelection()">Cancel</button>
+          </div>
+        </div>
+        <div class="planner" id="planner"></div>
       </div>
-      <div class="planner" id="planner"></div>
+      <div class="right-panel">
+        <h1>📅 Daily Planner</h1>
+        <div class="controls">
+          <button onclick="exportPDF()">📄 PDF</button>
+          <button onclick="exportTasks()">📁 Export</button>
+          <button onclick="printPlanner()">🖨️ Print</button>
+        </div>
+        <div class="controls">
+            <button onclick="window.location.href='index.html'">🔙 Back to Home</button>
+        </div>
+        <div class="file-upload">
+          <label for="importFile">📥 Import Tasks:</label>
+          <input type="file" id="importFile" accept=".txt" style="display:none;" onchange="confirmImport()" />
+          <button onclick="document.getElementById('importFile').click()">📂 Choose File</button>
+        </div>
+        <div id="taskStats"></div>
+      </div>
+    </div>
   </div>
 
   <script>
@@ -360,26 +376,6 @@
   reader.readAsText(file);
 }
 
-    function checkPassword() {
-      const input = document.getElementById("unlock-password").value;
-      const correctPassword = "planner2024"; // Use the same password as the notes page if needed
-
-      if (input === correctPassword) {
-        document.getElementById("lock-screen").style.display = "none";
-        document.getElementById("mainContent").style.display = "block";
-        if (localStorage.getItem("plannerTheme") === "dark") {
-          document.body.classList.add("dark");
-        }
-        createPlanner();
-      } else {
-        document.getElementById("error-msg").textContent = "❌ Wrong password!";
-      }
-    }
-
-    function cancelPassword() {
-      document.getElementById("password").value = "";
-    }
-
     function confirmImport() {
       const file = document.getElementById("importFile").files[0];
       if (file && confirm("Are you sure you want to import tasks from this file?")) {
@@ -416,6 +412,20 @@
         }
       });
     }, 60000);
+
+    function showDayConfirmation() {
+      document.getElementById("dayConfirmation").style.display = "block";
+    }
+
+    function confirmDaySelection() {
+      loadSelectedDay();
+      document.getElementById("dayConfirmation").style.display = "none";
+    }
+
+    function cancelDaySelection() {
+      document.getElementById("daySelector").value = ""; // Reset selection
+      document.getElementById("dayConfirmation").style.display = "none";
+    }
   </script>
 </body>
 </html>

@@ -185,37 +185,23 @@
     
 </head>
 <body>
-    <div id="lock-screen" style="position:fixed; top:0; left:0; width:100%; height:100%; background:#121212cc; display:flex; align-items:center; justify-content:center; z-index:9999;">
-        <div style="background:white; padding:30px; border-radius:10px; text-align:center; max-width:300px; width:100%;">
-          <h3>🔒 Enter Password</h3>
-          <input type="password" id="unlock-password" placeholder="••••" style="padding:10px; width:100%; margin:15px 0; border-radius:8px;" />
-          <button onclick="checkPassword()" class="btn add-btn">🔓 Unlock</button>
-          <p id="error-msg" style="color:red; margin-top:10px;"></p>
-        </div>
-      </div>
-
-  <div id="mainContent" style="display:none;">
+  <div id="mainContent">
     <audio id="reminder-sound" src="add.wav" preload="auto"></audio>
-  <button class="btn theme-btn" onclick="toggleTheme()">🌗 Toggle Dark Mode</button>
-
-
-
-  <div class="container">
-    <div class="left-panel">
-        
-      <h1>🗂 Notes List</h1>
-      <input type="text" id="search-input" placeholder="🔍 Search notes..." oninput="searchNotes()" />
-      
-      <div style="margin-bottom: 20px;">
-        <button class="btn" onclick="showCategory('Work')">💼 Work</button>
-        <button class="btn" onclick="showCategory('Personal')">🏠 Personal</button>
-        <button class="btn" onclick="showCategory('Ideas')">💡 Ideas</button>
-        <button class="btn" onclick="renderNotes()">📋 All Notes</button>
+    <button class="btn theme-btn" onclick="toggleTheme()">🌗 Toggle Dark Mode</button>
+    <div class="container">
+      <div class="left-panel">
+        <h1>🗂 Notes List</h1>
+        <input type="text" id="search-input" placeholder="🔍 Search notes..." oninput="searchNotes()" />
+        <div style="margin-bottom: 20px;">
+          <button class="btn" onclick="showCategory('Work')">💼 Work</button>
+          <button class="btn" onclick="showCategory('Personal')">🏠 Personal</button>
+          <button class="btn" onclick="showCategory('Ideas')">💡 Ideas</button>
+          <button class="btn" onclick="renderNotes()">📋 All Notes</button>
+        </div>
+        <button class="btn" onclick="printNotes()">🖨️ Print Notes</button>
+        <div id="notes-list"></div>
       </div>
-      <button class="btn" onclick="printNotes()">🖨️ Print Notes</button>
-      <div id="notes-list"></div>
-    </div>
-    <div class="right-panel">
+      <div class="right-panel">
         <div class="form-container">
           <h1>📝 Add Note</h1>
           <input type="text" id="note-title" placeholder="📌 Note Title" />
@@ -229,7 +215,6 @@
           <textarea id="note-text" rows="4" placeholder="✍️ Write your note here..."></textarea>
           <button class="btn add-btn" onclick="saveNote()">📀 Save Note</button>
           <div id="message" style="margin-top: 10px; font-weight: bold;"></div>
-    
         </div>
         <button class="btn" onclick="exportAsTXT()">📄 Export as TXT</button>
         <button class="btn" onclick="exportAsJSON()">📦 Export as JSON</button>
@@ -239,9 +224,6 @@
         <button class="btn back-btn" onclick="window.location.href='index.html'">🔙 Back to Home</button> 
       </div>
     </div>
-
-
-  </div>
   </div>
 
   <script>
@@ -249,7 +231,6 @@
     let notes = JSON.parse(localStorage.getItem("notesList")) || [];
     let editIndex = null;
     let draggedIndex = null;
-
 
     function renderNotes(filtered = notes) {
       const list = document.getElementById("notes-list");
@@ -285,59 +266,59 @@
     }
 
     function saveNote() {
-  const title = document.getElementById("note-title").value.trim();
-  const text = document.getElementById("note-text").value.trim();
-  const reminder = document.getElementById("note-reminder").value;
-  const category = document.getElementById("note-category").value;
+      const title = document.getElementById("note-title").value.trim();
+      const text = document.getElementById("note-text").value.trim();
+      const reminder = document.getElementById("note-reminder").value;
+      const category = document.getElementById("note-category").value;
 
-  if (!text || !title) return alert("❗ Please fill in both title and content!");
-  const now = new Date().toLocaleString("en-US");
+      if (!text || !title) return alert("❗ Please fill in both title and content!");
+      const now = new Date().toLocaleString("en-US");
 
-  const noteData = { title, text, category, reminder, date: now, pinned: false };
+      const noteData = { title, text, category, reminder, date: now, pinned: false };
 
-  if (editIndex !== null) {
-    notes[editIndex] = { ...notes[editIndex], ...noteData };
-    showMessage("✏️ Note updated successfully!");
-    editIndex = null;
-  } else {
-    notes.unshift(noteData);
-    showMessage("✅ Note saved successfully!");
-  }
+      if (editIndex !== null) {
+        notes[editIndex] = { ...notes[editIndex], ...noteData };
+        showMessage("✏️ Note updated successfully!");
+        editIndex = null;
+      } else {
+        notes.unshift(noteData);
+        showMessage("✅ Note saved successfully!");
+      }
 
-  localStorage.setItem("notesList", JSON.stringify(notes));
+      localStorage.setItem("notesList", JSON.stringify(notes));
 
-  // Clear inputs
-  document.getElementById("note-title").value = "";
-  document.getElementById("note-text").value = "";
-  document.getElementById("note-reminder").value = "";
-  document.getElementById("note-category").value = "";
+      // Clear inputs
+      document.getElementById("note-title").value = "";
+      document.getElementById("note-text").value = "";
+      document.getElementById("note-reminder").value = "";
+      document.getElementById("note-category").value = "";
 
-  renderNotes();
-}
-function editNote(index) {
-  document.getElementById("note-text").value = notes[index].text;
-  document.getElementById("note-reminder").value = notes[index].reminder || "";
-  document.getElementById("note-title").value = notes[index].title;
-  document.getElementById("note-category").value = notes[index].category || "";
-  editIndex = index;
-}
+      renderNotes();
+    }
+
+    function editNote(index) {
+      document.getElementById("note-text").value = notes[index].text;
+      document.getElementById("note-reminder").value = notes[index].reminder || "";
+      document.getElementById("note-title").value = notes[index].title;
+      document.getElementById("note-category").value = notes[index].category || "";
+      editIndex = index;
+    }
 
     function startDrag(index) {
-  draggedIndex = index;
-}
+      draggedIndex = index;
+    }
 
-function dropNote(targetIndex) {
-  if (draggedIndex === null || draggedIndex === targetIndex) return;
+    function dropNote(targetIndex) {
+      if (draggedIndex === null || draggedIndex === targetIndex) return;
 
-  const draggedNote = notes[draggedIndex];
-  notes.splice(draggedIndex, 1);
-  notes.splice(targetIndex, 0, draggedNote);
+      const draggedNote = notes[draggedIndex];
+      notes.splice(draggedIndex, 1);
+      notes.splice(targetIndex, 0, draggedNote);
 
-  draggedIndex = null;
-  localStorage.setItem("notesList", JSON.stringify(notes));
-  renderNotes();
-}
-
+      draggedIndex = null;
+      localStorage.setItem("notesList", JSON.stringify(notes));
+      renderNotes();
+    }
 
     function deleteNote(index) {
       if (confirm("Are you sure you want to delete this note?")) {
@@ -361,36 +342,34 @@ function dropNote(targetIndex) {
       renderNotes(filtered);
     }
 
-
     function checkReminder(reminderDate) {
-        const today = new Date().toISOString().split("T")[0];
-        if (reminderDate <= today) {
-            return ' 🔔';
-        }
-        return '';
-}
+      const today = new Date().toISOString().split("T")[0];
+      if (reminderDate <= today) {
+        return ' 🔔';
+      }
+      return '';
+    }
 
     function showCategory(category) {
-    const filtered = notes.filter(note => note.category === category);
-    renderNotes(filtered);
-    showMessage(`📂 Showing only: ${category}`);
+      const filtered = notes.filter(note => note.category === category);
+      renderNotes(filtered);
+      showMessage(`📂 Showing only: ${category}`);
     }
+
     function checkRemindersOnLoad() {
-  const today = new Date().toISOString().split("T")[0];
-  const dueNotes = notes.filter(note => note.reminder && note.reminder <= today);
+      const today = new Date().toISOString().split("T")[0];
+      const dueNotes = notes.filter(note => note.reminder && note.reminder <= today);
 
-  if (dueNotes.length > 0) {
-    showMessage(`🔔 You have ${dueNotes.length} reminder(s) due today!`);
+      if (dueNotes.length > 0) {
+        showMessage(`🔔 You have ${dueNotes.length} reminder(s) due today!`);
 
-    // انتظر تفاعل المستخدم قبل تشغيل الصوت
-    document.body.addEventListener("click", () => {
-      const sound = document.getElementById("reminder-sound");
-      if (sound) sound.play();
-    }, { once: true });
-  }
-}
-
-
+        // انتظر تفاعل المستخدم قبل تشغيل الصوت
+        document.body.addEventListener("click", () => {
+          const sound = document.getElementById("reminder-sound");
+          if (sound) sound.play();
+        }, { once: true });
+      }
+    }
 
     function showMessage(msg) {
       const msgDiv = document.getElementById("message");
@@ -459,18 +438,6 @@ function dropNote(targetIndex) {
       };
       reader.readAsText(file);
     }
-
-    function checkPassword() {
-  const input = document.getElementById("unlock-password").value;
-  const correctPassword = "1234"; // ✅ غيّرها إذا أردت
-
-  if (input === correctPassword) {
-    document.getElementById("lock-screen").style.display = "none";
-    document.getElementById("mainContent").style.display = "block";
-  } else {
-    document.getElementById("error-msg").textContent = "❌ Wrong password!";
-  }
-}
 
     function toggleTheme() {
       document.body.classList.toggle("dark");
