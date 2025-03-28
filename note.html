@@ -194,6 +194,7 @@
         </div>
       </div>
 
+  <div id="mainContent" style="display:none;">
     <audio id="reminder-sound" src="add.wav" preload="auto"></audio>
   <button class="btn theme-btn" onclick="toggleTheme()">🌗 Toggle Dark Mode</button>
 
@@ -240,6 +241,7 @@
     </div>
 
 
+  </div>
   </div>
 
   <script>
@@ -464,6 +466,7 @@ function dropNote(targetIndex) {
 
   if (input === correctPassword) {
     document.getElementById("lock-screen").style.display = "none";
+    document.getElementById("mainContent").style.display = "block";
   } else {
     document.getElementById("error-msg").textContent = "❌ Wrong password!";
   }
