@@ -191,7 +191,7 @@
   <div id="mainContent">
     <div class="container">
         <div>
-            <button onclick="toggleTheme()">🌗 Toggle Theme</button>
+            <button onclick="toggleTheme()" aria-label="Toggle dark mode">🌗 Toggle Theme</button>
         </div>
       <div class="left-panel">
 
@@ -209,8 +209,8 @@
             <option value="Sunday">Sunday</option>
           </select>
           <div id="dayConfirmation" style="display:none; margin-top: 10px;">
-            <button onclick="confirmDaySelection()">OK</button>
-            <button onclick="cancelDaySelection()">Cancel</button>
+            <button onclick="confirmDaySelection()" aria-label="Confirm day selection">OK</button>
+            <button onclick="cancelDaySelection()" aria-label="Cancel day selection">Cancel</button>
           </div>
         </div>
         <div class="planner" id="planner"></div>
@@ -218,17 +218,17 @@
       <div class="right-panel">
         <h1>📅 Daily Planner</h1>
         <div class="controls">
-          <button onclick="exportPDF()">📄 PDF</button>
-          <button onclick="exportTasks()">📁 Export</button>
-          <button onclick="printPlanner()">🖨️ Print</button>
+          <button onclick="exportPDF()" aria-label="Export as PDF">📄 PDF</button>
+          <button onclick="exportTasks()" aria-label="Export tasks">📁 Export</button>
+          <button onclick="printPlanner()" aria-label="Print planner">🖨️ Print</button>
         </div>
         <div class="controls">
-            <button onclick="window.location.href='index.html'">🔙 Back to Home</button>
+            <button onclick="window.location.href='index.html'" aria-label="Back to Home">🔙 Back to Home</button>
         </div>
         <div class="file-upload">
           <label for="importFile">📥 Import Tasks:</label>
           <input type="file" id="importFile" accept=".txt" style="display:none;" onchange="confirmImport()" />
-          <button onclick="document.getElementById('importFile').click()">📂 Choose File</button>
+          <button onclick="document.getElementById('importFile').click()" aria-label="Choose file to import tasks">📂 Choose File</button>
         </div>
         <div id="taskStats"></div>
       </div>

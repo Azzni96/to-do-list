@@ -187,18 +187,18 @@
 <body>
   <div id="mainContent">
     <audio id="reminder-sound" src="add.wav" preload="auto"></audio>
-    <button class="btn theme-btn" onclick="toggleTheme()">🌗 Toggle Dark Mode</button>
+  <button class="btn theme-btn" onclick="toggleTheme()" aria-label="Toggle dark mode">🌗 Toggle Dark Mode</button>
     <div class="container">
       <div class="left-panel">
         <h1>🗂 Notes List</h1>
         <input type="text" id="search-input" placeholder="🔍 Search notes..." oninput="searchNotes()" />
         <div style="margin-bottom: 20px;">
-          <button class="btn" onclick="showCategory('Work')">💼 Work</button>
-          <button class="btn" onclick="showCategory('Personal')">🏠 Personal</button>
-          <button class="btn" onclick="showCategory('Ideas')">💡 Ideas</button>
-          <button class="btn" onclick="renderNotes()">📋 All Notes</button>
+          <button class="btn" onclick="showCategory('Work')" aria-label="Show work notes">💼 Work</button>
+          <button class="btn" onclick="showCategory('Personal')" aria-label="Show personal notes">🏠 Personal</button>
+          <button class="btn" onclick="showCategory('Ideas')" aria-label="Show idea notes">💡 Ideas</button>
+    <button class="btn" onclick="renderNotes()" aria-label="Show all notes">📋 All Notes</button>
         </div>
-        <button class="btn" onclick="printNotes()">🖨️ Print Notes</button>
+  <button class="btn" onclick="printNotes()" aria-label="Print notes">🖨️ Print Notes</button>
         <div id="notes-list"></div>
       </div>
       <div class="right-panel">
@@ -213,7 +213,7 @@
           </select>
           <input type="date" id="note-reminder" />
           <textarea id="note-text" rows="4" placeholder="✍️ Write your note here..."></textarea>
-          <button class="btn add-btn" onclick="saveNote()">📀 Save Note</button>
+          <button class="btn add-btn" onclick="saveNote()" aria-label="Save note">📀 Save Note</button>
           <div id="message" style="margin-top: 10px; font-weight: bold;"></div>
         </div>
         <button class="btn" onclick="exportAsTXT()">📄 Export as TXT</button>

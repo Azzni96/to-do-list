@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">  
+    <link rel="stylesheet" href="weather.css">
+    <title>Weather App</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <!-- Language Buttons -->
+    <div class="language-buttons">
+        <button class="lang-btn" data-lang="en">EN</button>
+        <button class="lang-btn" data-lang="fi">FI</button>
+        <button class="lang-btn" data-lang="ar">عر</button>
+    </div>
+
+    <!-- Language Selector -->
+    <div class="language-selector" style="display:none;">
+        <select id="language-selector">
+            <option value="en">English</option>
+            <option value="fi">Suomi</option>
+            <option value="ar">العربية</option>
+        </select>
+   
+    </div>
+
+
+    <!-- Main Card -->
+    <div class="card">
+        <!-- Search Box -->
+        <div class="search">
+            <input type="text" placeholder="Enter city name" spellcheck="false" />
+            <button><img src="images/search.png" alt="Search"></button>
+        </div>
+
+        <!-- Error Message -->
+        <div class="error">
+            <p>City not found</p>
+        </div>
+
+        <!-- Loader -->
+        <div class="loader"></div>
+
+        <!-- Weather Info -->
+        <div class="weather">
+            <img src="images/rain.png" class="weather-icon" alt="Weather Icon">
+            <h1 class="temp">22°c</h1>
+            <h2 class="city">New York</h2>
+
+            <!-- Basic Details -->
+            <div class="details">
+                <div class="col">
+                    <img src="images/humidity.png" alt="Humidity Icon">
+                    <div>
+                        <p class="humidity">50%</p>
+                        <p class="humidity-label">Humidity</p>
+                    </div>
+                </div>
+                <div class="col">
+                    <img src="images/wind.png" alt="Wind Icon">
+                    <div>
+                        <p class="wind">15km/h</p>
+                        <p class="wind-label">Wind Speed</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Extended Details -->
+            <div class="extended-details">
+                <div class="detail-item">
+                    <img src="images/feels-like.png" alt="Feels Like Icon">
+                    <div>
+                        <p class="feels-like">20°C</p>
+                        <p class="feels-like-label">Feels like</p>
+                    </div>
+                </div>
+                <div class="detail-item">
+                    <img src="images/pressure.png" alt="Pressure Icon">
+                    <div>
+                        <p class="pressure">1015 hPa</p>
+                        <p class="pressure-label">Pressure</p>
+                    </div>
+                </div>
+                <div class="detail-item">
+                    <img src="images/visibility.png" alt="Visibility Icon">
+                    <div>
+                        <p class="visibility">10 km</p>
+                        <p class="visibility-label">Visibility</p>
+                    </div>
+                </div>
+                <div class="detail-item">
+                    <img src="images/sunrise.png" alt="Sunrise/Sunset Icon">
+                    <div>
+                        <p><span class="sunrise">06:00</span> / <span class="sunset">18:00</span></p>
+                        <p>Sunrise / Sunset</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Unit Toggle -->
+            <div class="unit-toggle-container">
+                <span>°C</span>
+                <label class="toggle-switch">
+                    <input type="checkbox" class="unit-toggle">
+                    <span class="slider"></span>
+                </label>
+                <span>°F</span>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="actions">
+                <button class="location-btn">Find my location</button>
+                <button class="fav-btn">Add to favorites</button>
+                <button class="theme-switch">Dark mode</button>
+            </div>
+
+            <!-- Favorites -->
+            <div class="favorites-container">
+                <button class="favorites-btn">Favorites</button>
+                <div class="favorites-dropdown"></div>
+            </div>
+        </div>
+
+        <!-- Forecast Section -->
+        <div class="forecast">
+            <h3 class="forecast-title">Forecast</h3>
+            <div class="forecast-container"></div>
+        </div>
+
+        <!-- Date & Time -->
+        <div class="date-time">
+            <p class="date"></p>
+            <p class="day"></p>
+            <p class="time"></p>
+        </div>
+
+
+
+        <!-- Weather Alerts -->
+        <div class="alerts-container">
+            <h3 class="alerts-title">Weather Alerts</h3>
+            <div class="alerts-list"></div>
+        </div>
+
+        <!-- Leaflet Map -->
+        <div id="leafletMap" style="height: 300px;"></div>
+
+        <!-- Temperature Chart -->
+        <canvas id="tempChart" width="400" height="200"></canvas>
+        <div class="index">
+            <button class="index-btn" onclick="window.location.href='index.html'">Index</button>
+            <button id="shareWeather">📤 Share</button>
+        </div>
+        <!-- Share Button -->
+       
+    </div>
+
+    <!-- JavaScript File -->
+    <script src="weather.js"></script>
+</body>
+</html>

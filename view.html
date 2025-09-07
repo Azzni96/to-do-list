@@ -166,33 +166,33 @@
 </head>
 <body>
 
-  <button onclick="window.location.href='index.html'" style="margin: 20px auto; display: block;">
+  <button onclick="window.location.href='index.html'" style="margin: 20px auto; display: block;" aria-label="Back to Home Page">
     🔙 Back to Home Page
   </button>
 
-  <button id="toggle-theme">🌙 Toggle Dark Mode</button>
+  <button id="toggle-theme" aria-label="Toggle dark mode">🌙 Toggle Dark Mode</button>
 
   <div class="main-container">
     <!-- Filter Buttons -->
     <div class="filters">
       <div class="filter-group">
         <h4>Status</h4>
-        <button onclick="showAll()">📋 All Tasks</button>
-        <button onclick="showDone()">✅ Done</button>
-        <button onclick="showUndone()">🕑 Not Done</button>
+  <button onclick="showAll()" aria-label="Show all tasks">📋 All Tasks</button>
+  <button onclick="showDone()" aria-label="Show completed tasks">✅ Done</button>
+  <button onclick="showUndone()" aria-label="Show incomplete tasks">🕑 Not Done</button>
       </div>
       <div class="filter-group">
         <h4>Sort</h4>
-        <button onclick="sortByPriority()">🗂️ By Priority</button>
-        <button onclick="sortByDate()">📅 By Date</button>
-        <button onclick="sortByName()">🔤 By Name</button>
+  <button onclick="sortByPriority()" aria-label="Sort by priority">🗂️ By Priority</button>
+  <button onclick="sortByDate()" aria-label="Sort by date">📅 By Date</button>
+  <button onclick="sortByName()" aria-label="Sort by name">🔤 By Name</button>
       </div>
       <div class="filter-group">
         <h4>Export</h4>
-        <button onclick="downloadPDF()">📤 Download PDF</button>
-        <button onclick="window.print()">🖨️ Print</button>
-        <button onclick="exportToExcel()">📊 Export to Excel</button>
-        <button onclick="downloadCSV()">📄 Download CSV</button>
+  <button onclick="downloadPDF()" aria-label="Download as PDF">📤 Download PDF</button>
+  <button onclick="window.print()" aria-label="Print tasks">🖨️ Print</button>
+  <button onclick="exportToExcel()" aria-label="Export to Excel">📊 Export to Excel</button>
+  <button onclick="downloadCSV()" aria-label="Download as CSV">📄 Download CSV</button>
       </div>
     </div>
 

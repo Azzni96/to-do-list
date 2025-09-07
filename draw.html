@@ -2,123 +2,277 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>🎨 Draw & 3D Convert</title>
+  <title>🎨 Draw & Save</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
+    * {
+      box-sizing: border-box;
+    }
     body {
       margin: 0;
-      font-family: Arial, sans-serif;
-      background: #f0f0f0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(to right, #f4f4f4, #e8f0ff);
       display: flex;
       flex-direction: column;
       align-items: center;
+      padding-bottom: 40px;
     }
-
-    canvas#drawCanvas {
-      border: 2px solid #333;
+    h2 {
       margin-top: 20px;
+      color: #1d3557;
+      text-shadow: 1px 1px 1px rgba(0,0,0,0.1);
+    }
+    canvas {
+      border: 2px solid #1d3557;
+      margin-top: 20px;
+      background-color: #fff;
+      background-image:
+        linear-gradient(to right, rgba(0,0,0,0.05) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(0,0,0,0.05) 1px, transparent 1px);
+      background-size: 20px 20px;
       cursor: crosshair;
     }
-
     #controls {
-      margin: 20px;
+      margin-top: 20px;
       display: flex;
       flex-wrap: wrap;
       justify-content: center;
       gap: 10px;
+      max-width: 900px;
     }
-
-    button, select, input[type=color], input[type=range] {
+    #controls button,
+    #controls input,
+    #controls select {
       padding: 10px;
       border-radius: 8px;
       border: 1px solid #ccc;
       font-size: 14px;
-      cursor: pointer;
+      min-width: 100px;
+      background: #f9f9f9;
+      transition: 0.2s;
     }
-
-    #three-container {
-      width: 100%;
-      height: 400px;
+    #controls button:hover {
+      background-color: #457b9d;
+      color: #fff;
+    }
+    #undoCounter {
+      margin-top: 10px;
+      font-weight: bold;
+      color: #1d3557;
+    }
+    @media (max-width: 600px) {
+      canvas {
+        width: 90vw;
+        height: 90vw;
+      }
     }
   </style>
 </head>
 <body>
-  <h2>✏️ Draw on Canvas and Convert to 3D Cube</h2>
-  <canvas id="drawCanvas" width="400" height="400"></canvas>
-
+  <h2>✏️ Draw & Save Your Artwork</h2>
+  <canvas id="drawCanvas" width="600" height="600"></canvas>
   <div id="controls">
     <input type="color" id="colorPicker" value="#000000" />
-    <input type="range" id="brushSize" min="1" max="10" value="2" />
+    <input type="range" id="brushSize" min="1" max="20" value="4" />
+    <select id="tool">
+      <option value="pen">✏️ Pen</option>
+      <option value="line">📏 Line</option>
+      <option value="rect">⬛ Rectangle</option>
+      <option value="circle">⚪ Circle</option>
+      <option value="triangle">🔺 Triangle</option>
+      <option value="polygon">🧷 Polygon</option>
+      <option value="star">⭐ Star</option>
+      <option value="text">💬 Text</option>
+      <option value="move">🧭 Move</option>
+      <option value="fill">🖍️ Fill</option>
+    </select>
+    <input type="text" id="textInput" placeholder="Your note..." style="width: 140px" />
+    <button onclick="toggleEraser()">🧲 Eraser</button>
+    <button onclick="undoLast()">↩️ Undo</button>
     <button onclick="clearCanvas()">🧹 Clear</button>
-    <button onclick="convertTo3D()">🧊 Convert to 3D</button>
-    <button onclick="window.location.href='index.html'">🔙 Back</button>
+    <button onclick="saveAsImage()">💾 Save PNG</button>
+    <button onclick="printCanvas()">🖨️ Print</button>
+    <button onclick="saveAsJSON()">🧠 Save JSON</button>
+    <input type="file" accept="image/*" onchange="importImage(event)" />
   </div>
-
-  <div id="three-container"></div>
+  <div id="undoCounter">🧮 Undo Steps: 0</div>
 
   <script>
     const canvas = document.getElementById('drawCanvas');
-    const ctx = canvas.getContext('2d');
-    let isDrawing = false;
+    const ctx = canvas.getContext('2d', { willReadFrequently: true });
+    let isDrawing = false, isEraser = false, moving = false;
+    let lastX = 0, lastY = 0;
+    let undoStack = [], moveData = null;
 
     const colorPicker = document.getElementById('colorPicker');
     const brushSize = document.getElementById('brushSize');
+    const toolSelect = document.getElementById('tool');
+    const textInput = document.getElementById('textInput');
 
-    canvas.addEventListener('mousedown', () => isDrawing = true);
-    canvas.addEventListener('mouseup', () => isDrawing = false);
-    canvas.addEventListener('mouseout', () => isDrawing = false);
-    canvas.addEventListener('mousemove', draw);
+    function updateUndoCounter() {
+      document.getElementById("undoCounter").innerText = `🧮 Undo Steps: ${undoStack.length}`;
+    }
 
-    function draw(e) {
-      if (!isDrawing) return;
+    function saveState() {
+      undoStack.push(canvas.toDataURL());
+      if (undoStack.length > 30) undoStack.shift();
+      updateUndoCounter();
+    }
+
+    function undoLast() {
+      if (undoStack.length === 0) return;
+      const img = new Image();
+      img.onload = () => ctx.drawImage(img, 0, 0);
+      img.src = undoStack.pop();
+      updateUndoCounter();
+    }
+
+    function getCoords(e) {
       const rect = canvas.getBoundingClientRect();
-      const x = e.clientX - rect.left;
-      const y = e.clientY - rect.top;
+      return {
+        x: (e.clientX || e.touches?.[0].clientX) - rect.left,
+        y: (e.clientY || e.touches?.[0].clientY) - rect.top
+      };
+    }
 
-      ctx.fillStyle = colorPicker.value;
+    canvas.addEventListener('mousedown', (e) => {
+      const { x, y } = getCoords(e);
+      lastX = x; lastY = y;
+      isDrawing = true;
+      if (toolSelect.value === 'move') {
+        moveData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+        moving = true;
+        return;
+      }
+      saveState();
+    });
+
+    canvas.addEventListener('mouseup', (e) => {
+      const { x, y } = getCoords(e);
+      if (toolSelect.value === 'move') {
+        moving = false;
+        return;
+      }
+      isDrawing = false;
+      ctx.strokeStyle = ctx.fillStyle = isEraser ? '#fff' : colorPicker.value;
+      ctx.lineWidth = brushSize.value;
       ctx.beginPath();
-      ctx.arc(x, y, brushSize.value, 0, Math.PI * 2);
+      switch(toolSelect.value) {
+        case 'rect': ctx.fillRect(lastX, lastY, x - lastX, y - lastY); break;
+        case 'circle':
+          ctx.arc(lastX, lastY, Math.hypot(x - lastX, y - lastY), 0, Math.PI * 2);
+          ctx.fill(); break;
+        case 'triangle':
+          ctx.moveTo(lastX, lastY);
+          ctx.lineTo(x, y);
+          ctx.lineTo(2 * lastX - x, y);
+          ctx.closePath();
+          ctx.fill(); break;
+        case 'line':
+          ctx.moveTo(lastX, lastY);
+          ctx.lineTo(x, y);
+          ctx.stroke(); break;
+        case 'text':
+          ctx.font = `${brushSize.value * 4}px Arial`;
+          ctx.fillText(textInput.value || 'Note', x, y); break;
+        case 'polygon': drawPolygon(lastX, lastY, 5, Math.hypot(x - lastX, y - lastY)); break;
+        case 'star': drawStar(lastX, lastY, 5, Math.hypot(x - lastX, y - lastY)); break;
+      }
+    });
+
+    canvas.addEventListener('mousemove', (e) => {
+      const { x, y } = getCoords(e);
+      if (moving && moveData) {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.putImageData(moveData, x - lastX, y - lastY);
+      }
+      if (!isDrawing || toolSelect.value !== 'pen') return;
+      ctx.strokeStyle = isEraser ? '#fff' : colorPicker.value;
+      ctx.lineWidth = brushSize.value;
+      ctx.lineCap = 'round';
+      ctx.beginPath();
+      ctx.moveTo(lastX, lastY);
+      ctx.lineTo(x, y);
+      ctx.stroke();
+      lastX = x; lastY = y;
+    });
+
+    function drawPolygon(cx, cy, sides, radius) {
+      const angle = (Math.PI * 2) / sides;
+      ctx.beginPath();
+      for (let i = 0; i <= sides; i++) {
+        const x = cx + radius * Math.cos(i * angle);
+        const y = cy + radius * Math.sin(i * angle);
+        i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+      }
+      ctx.closePath();
       ctx.fill();
+    }
+
+    function drawStar(cx, cy, spikes, outer, inner = outer / 2) {
+      let rot = Math.PI / 2 * 3;
+      let x = cx;
+      let y = cy;
+      const step = Math.PI / spikes;
+      ctx.beginPath();
+      ctx.moveTo(cx, cy - outer);
+      for (let i = 0; i < spikes; i++) {
+        x = cx + Math.cos(rot) * outer;
+        y = cy + Math.sin(rot) * outer;
+        ctx.lineTo(x, y);
+        rot += step;
+        x = cx + Math.cos(rot) * inner;
+        y = cy + Math.sin(rot) * inner;
+        ctx.lineTo(x, y);
+        rot += step;
+      }
+      ctx.lineTo(cx, cy - outer);
+      ctx.closePath();
+      ctx.fill();
+    }
+
+    function toggleEraser() {
+      isEraser = !isEraser;
     }
 
     function clearCanvas() {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
-      document.getElementById('three-container').innerHTML = '';
+      undoStack = [];
+      updateUndoCounter();
     }
-  </script>
 
-  <script type="module">
-    import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.152.2/build/three.module.js';
-    window.THREE = THREE;
+    function saveAsImage() {
+      const link = document.createElement('a');
+      link.download = 'drawing.png';
+      link.href = canvas.toDataURL('image/png');
+      link.click();
+    }
 
-    window.convertTo3D = function () {
-      const container = document.getElementById('three-container');
-      container.innerHTML = '';
+    function printCanvas() {
+      const win = window.open();
+      win.document.write(`<img src="${canvas.toDataURL()}" style="width:100%">`);
+      win.print();
+    }
 
-      const scene = new THREE.Scene();
-      const camera = new THREE.PerspectiveCamera(75, container.clientWidth / 400, 0.1, 1000);
-      const renderer = new THREE.WebGLRenderer();
-      renderer.setSize(container.clientWidth, 400);
-      container.appendChild(renderer.domElement);
+    function saveAsJSON() {
+      const data = JSON.stringify({ image: canvas.toDataURL() });
+      const blob = new Blob([data], { type: 'application/json' });
+      const link = document.createElement('a');
+      link.href = URL.createObjectURL(blob);
+      link.download = 'drawing.json';
+      link.click();
+    }
 
-      const canvasTexture = new THREE.CanvasTexture(canvas);
-      const geometry = new THREE.BoxGeometry(2, 2, 2);
-      const material = new THREE.MeshStandardMaterial({ map: canvasTexture });
-      const cube = new THREE.Mesh(geometry, material);
-      scene.add(cube);
-
-      const light = new THREE.DirectionalLight(0xffffff, 1);
-      light.position.set(5, 5, 5);
-      scene.add(light);
-
-      camera.position.z = 5;
-
-      function animate() {
-        requestAnimationFrame(animate);
-        cube.rotation.x += 0.01;
-        cube.rotation.y += 0.01;
-        renderer.render(scene, camera);
-      }
-      animate();
+    function importImage(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = e => {
+        const img = new Image();
+        img.onload = () => ctx.drawImage(img, 0, 0);
+        img.src = e.target.result;
+      };
+      reader.readAsDataURL(file);
     }
   </script>
 </body>

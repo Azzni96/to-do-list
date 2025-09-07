@@ -20,54 +20,58 @@
       <!-- Status Filters -->
       <div class="filter-group">
         <h4>Status</h4>
-        <button id="filter-done">✅ Work done</button>
-        <button id="filter-undone">🕑 Work is not done</button>
-        <button id="show-all">📋 All works</button>
+  <button id="filter-done" aria-label="Show completed work">✅ Work done</button>
+  <button id="filter-undone" aria-label="Show incomplete work">🕑 Work is not done</button>
+  <button id="show-all" aria-label="Show all work">📋 All works</button>
       </div>
 
       <!-- Sorting Filters -->
       <div class="filter-group">
         <h4>Sort</h4>
-        <button id="sort-oldest">⏳ Sort by oldest</button>
-        <button id="sort-priority">🗂️ Sort by priority</button>
-        <button id="sort-date">📅 Sort by date</button>
-        <button id="sort-name">🔤 Sort A → Z</button>
+  <button id="sort-oldest" aria-label="Sort by oldest">⏳ Sort by oldest</button>
+  <button id="sort-priority" aria-label="Sort by priority">🗂️ Sort by priority</button>
+  <button id="sort-date" aria-label="Sort by date">📅 Sort by date</button>
+  <button id="sort-name" aria-label="Sort by name">🔤 Sort A → Z</button>
       </div>
 
       <!-- Deadline Filters -->
       <div class="filter-group">
         <h4>Deadlines</h4>
-        <button id="filter-today">📅 Today's tasks</button>
-        <button id="filter-deadline-today">📌 Today's deadlines</button>
-        <button id="filter-deadline-passed">⏰ Passed deadlines</button>
-        <button id="filter-deadline-future">📅 Future deadlines</button>
+  <button id="filter-today" aria-label="Show today's tasks">📅 Today's tasks</button>
+  <button id="filter-deadline-today" aria-label="Show today's deadlines">📌 Today's deadlines</button>
+  <button id="filter-deadline-passed" aria-label="Show passed deadlines">⏰ Passed deadlines</button>
+  <button id="filter-deadline-future" aria-label="Show future deadlines">📅 Future deadlines</button>
       </div>
 
       <!-- Other -->
       <div class="filter-group">
         <h4>Actions</h4>
-        <button id="reset-filters">🔁 Reset filters</button>
-        <button id="clear-all">🗑️ Clear all</button>
-        <button onclick="window.location.href='view.html'">👁️ View only</button>
+  <button id="reset-filters" aria-label="Reset all filters">🔁 Reset filters</button>
+  <button id="clear-all" aria-label="Clear all tasks">🗑️ Clear all</button>
+  <button onclick="window.location.href='view.html'" aria-label="View only mode">👁️ View only</button>
       </div>
       <div class="filter-group">
         <h4>Notes</h4>
-        <button onclick="window.location.href='note.html'">📝 Notes</button>
+  <button onclick="window.location.href='note.html'" aria-label="Go to notes">📝 Notes</button>
       </div>
       <div class="filter-group">
         <h4>Planner</h4>
-        <button onclick="window.location.href='planner.html'">📅 Planner</button>
+  <button onclick="window.location.href='planner.html'" aria-label="Go to planner">📅 Planner</button>
         </div>
       <div class="filter-group">
         <h4>draw</h4>
-        <button onclick="window.location.href='draw.html'">🖌️ Draw</button>
+  <button onclick="window.location.href='draw.html'" aria-label="Go to draw page">🖌️ Draw</button>
           </div>
       <div class="filter-group">
+        <h4>Weather</h4>
+        <button onclick="window.location.href='weather.html'">🌤️ Weather</button>
+      </div>
+      <div class="filter-group">
         <h4>Export</h4>
-        <button onclick="exportToExcel()">📊 Export to Excel</button>
-        <button onclick="downloadPDF()">📤 Download PDF</button>
-        <button onclick="printTasks()">🖨️ Print</button>
-        <button onclick="downloadCSV()">📄 Download CSV</button>
+  <button onclick="exportToExcel()" aria-label="Export tasks to Excel">📊 Export to Excel</button>
+  <button onclick="downloadPDF()" aria-label="Download tasks as PDF">📤 Download PDF</button>
+  <button onclick="printTasks()" aria-label="Print tasks">🖨️ Print</button>
+  <button onclick="downloadCSV()" aria-label="Download tasks as CSV">📄 Download CSV</button>
       </div>
     </div>
 
@@ -82,6 +86,8 @@
       <!-- Stats and Clock -->
       <div id="stats">📊 Loading...</div>
       <div id="clock">🕒 Loading time...</div>
+
+      
 
       <!-- Search -->
       <div class="search">
@@ -119,8 +125,8 @@
           </select>
         </div>
         <div class="btn">
-          <button id="add">Add</button>
-          <button id="cancel">Cancel</button>
+          <button id="add" aria-label="Add task">Add</button>
+          <button id="cancel" aria-label="Cancel task entry">Cancel</button>
         </div>
       </div>
     </div>
